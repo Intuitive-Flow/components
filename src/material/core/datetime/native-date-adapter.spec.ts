@@ -1,18 +1,15 @@
 import {LOCALE_ID} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
-import {Platform} from '@angular/cdk/platform';
 import {DEC, FEB, JAN, MAR} from '../../testing';
 import {DateAdapter, MAT_DATE_LOCALE, NativeDateAdapter, NativeDateModule} from './index';
 
 describe('NativeDateAdapter', () => {
   let adapter: NativeDateAdapter;
   let assertValidDate: (d: Date | null, valid: boolean) => void;
-  let platform: Platform;
 
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [NativeDateModule]});
     adapter = TestBed.inject(DateAdapter) as NativeDateAdapter;
-    platform = TestBed.inject(Platform);
 
     assertValidDate = (d: Date | null, valid: boolean) => {
       expect(adapter.isDateInstance(d))
@@ -587,13 +584,9 @@ describe('NativeDateAdapter', () => {
     expect(adapter.isValid(adapter.parseTime('123')!)).toBe(false);
     expect(adapter.isValid(adapter.parseTime('14:52 PM')!)).toBe(false);
     expect(adapter.isValid(adapter.parseTime('24:05')!)).toBe(false);
-
-    // Firefox is a bit more forgiving of invalid times than other browsers.
-    // E.g. these just roll over instead of producing an invalid object.
-    if (!platform.FIREFOX) {
-      expect(adapter.isValid(adapter.parseTime('00:61:05')!)).toBe(false);
-      expect(adapter.isValid(adapter.parseTime('14:52:78')!)).toBe(false);
-    }
+    expect(adapter.isValid(adapter.parseTime('00:61:05')!)).toBe(false);
+    expect(adapter.isValid(adapter.parseTime('14:52:78')!)).toBe(false);
+    expect(adapter.isValid(adapter.parseTime('12:10 PM11:10 PM')!)).toBe(false);
   });
 
   it('should return null when parsing unsupported time values', () => {
@@ -605,23 +598,25 @@ describe('NativeDateAdapter', () => {
   });
 
   it('should compare times', () => {
-    const base = [2024, JAN, 1] as const;
+    // Use different dates to guarantee that we only compare the times.
+    const aDate = [2024, JAN, 1] as const;
+    const bDate = [2024, FEB, 7] as const;
 
     expect(
-      adapter.compareTime(new Date(...base, 12, 0, 0), new Date(...base, 13, 0, 0)),
+      adapter.compareTime(new Date(...aDate, 12, 0, 0), new Date(...bDate, 13, 0, 0)),
     ).toBeLessThan(0);
     expect(
-      adapter.compareTime(new Date(...base, 12, 50, 0), new Date(...base, 12, 51, 0)),
+      adapter.compareTime(new Date(...aDate, 12, 50, 0), new Date(...bDate, 12, 51, 0)),
     ).toBeLessThan(0);
-    expect(adapter.compareTime(new Date(...base, 1, 2, 3), new Date(...base, 1, 2, 3))).toBe(0);
+    expect(adapter.compareTime(new Date(...aDate, 1, 2, 3), new Date(...bDate, 1, 2, 3))).toBe(0);
     expect(
-      adapter.compareTime(new Date(...base, 13, 0, 0), new Date(...base, 12, 0, 0)),
+      adapter.compareTime(new Date(...aDate, 13, 0, 0), new Date(...bDate, 12, 0, 0)),
     ).toBeGreaterThan(0);
     expect(
-      adapter.compareTime(new Date(...base, 12, 50, 11), new Date(...base, 12, 50, 10)),
+      adapter.compareTime(new Date(...aDate, 12, 50, 11), new Date(...bDate, 12, 50, 10)),
     ).toBeGreaterThan(0);
     expect(
-      adapter.compareTime(new Date(...base, 13, 0, 0), new Date(...base, 10, 59, 59)),
+      adapter.compareTime(new Date(...aDate, 13, 0, 0), new Date(...bDate, 10, 59, 59)),
     ).toBeGreaterThan(0);
   });
 
