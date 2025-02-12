@@ -17,6 +17,7 @@ import { MatOptionParentComponent } from '@angular/material/core';
 import { ModelSignal } from '@angular/core';
 import { OnDestroy } from '@angular/core';
 import { OutputEmitterRef } from '@angular/core';
+import { ScrollStrategy } from '@angular/cdk/overlay';
 import { Signal } from '@angular/core';
 import { TemplateRef } from '@angular/core';
 import { ValidationErrors } from '@angular/forms';
@@ -26,9 +27,14 @@ import { Validator } from '@angular/forms';
 export const MAT_TIMEPICKER_CONFIG: InjectionToken<MatTimepickerConfig>;
 
 // @public
+export const MAT_TIMEPICKER_SCROLL_STRATEGY: InjectionToken<() => ScrollStrategy>;
+
+// @public
 export class MatTimepicker<D> implements OnDestroy, MatOptionParentComponent {
     constructor();
     readonly activeDescendant: Signal<string | null>;
+    // (undocumented)
+    protected _animationsDisabled: boolean;
     readonly ariaLabel: InputSignal<string | null>;
     readonly ariaLabelledby: InputSignal<string | null>;
     close(): void;
@@ -36,6 +42,7 @@ export class MatTimepicker<D> implements OnDestroy, MatOptionParentComponent {
     readonly disabled: Signal<boolean>;
     readonly disableRipple: InputSignalWithTransform<boolean, unknown>;
     protected _getAriaLabelledby(): string | null;
+    protected _handleAnimationEnd(event: AnimationEvent): void;
     readonly interval: InputSignalWithTransform<number | null, number | string | null>;
     readonly isOpen: Signal<boolean>;
     // (undocumented)
@@ -50,7 +57,7 @@ export class MatTimepicker<D> implements OnDestroy, MatOptionParentComponent {
     protected _panelTemplate: Signal<TemplateRef<unknown>>;
     registerInput(input: MatTimepickerInput<D>): void;
     readonly selected: OutputEmitterRef<MatTimepickerSelected<D>>;
-    protected _selectValue(value: D): void;
+    protected _selectValue(option: MatOption<D>): void;
     // (undocumented)
     protected _timeOptions: readonly MatTimepickerOption<D>[];
     // (undocumented)

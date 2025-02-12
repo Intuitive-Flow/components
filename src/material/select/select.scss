@@ -13,6 +13,27 @@ $mat-select-placeholder-arrow-space: 2 *
 $leading-width: 12px !default;
 $scale: 0.75 !default;
 
+@keyframes _mat-select-enter {
+  from {
+    opacity: 0;
+    transform: scaleY(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes _mat-select-exit {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
 
 .mat-mdc-select {
   display: inline-block;
@@ -173,6 +194,14 @@ div.mat-mdc-select-panel {
   }
 }
 
+.mat-select-panel-animations-enabled {
+  animation: _mat-select-enter 120ms cubic-bezier(0, 0, 0.2, 1);
+
+  &.mat-select-panel-exit {
+    animation: _mat-select-exit 100ms linear;
+  }
+}
+
 .mat-mdc-select-placeholder {
   // Delay the transition until the label has animated about a third of the way through, in
   // order to prevent the placeholder from overlapping for a split second.
@@ -185,7 +214,7 @@ div.mat-mdc-select-panel {
     @include token-utils.create-token-slot(color, placeholder-text-color);
   }
 
-  .mat-form-field-no-animations &,
+  .mat-mdc-form-field:not(.mat-form-field-animations-enabled) &,
   ._mat-animation-noopable & {
     transition: none;
   }

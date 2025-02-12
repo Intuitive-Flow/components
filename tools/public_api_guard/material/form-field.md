@@ -8,7 +8,6 @@ import { AbstractControlDirective } from '@angular/forms';
 import { AfterContentChecked } from '@angular/core';
 import { AfterContentInit } from '@angular/core';
 import { AfterViewInit } from '@angular/core';
-import { AnimationTriggerMetadata } from '@angular/animations';
 import { BooleanInput } from '@angular/cdk/coercion';
 import { ElementRef } from '@angular/core';
 import * as i0 from '@angular/core';
@@ -65,7 +64,7 @@ export class MatFormField implements FloatingLabelParent, AfterContentInit, Afte
     constructor(...args: unknown[]);
     _animateAndLockLabel(): void;
     // (undocumented)
-    _animationMode: "NoopAnimations" | "BrowserAnimations" | null;
+    protected readonly _animationsDisabled: boolean;
     get appearance(): MatFormFieldAppearance;
     set appearance(value: MatFormFieldAppearance);
     color: ThemePalette;
@@ -131,7 +130,6 @@ export class MatFormField implements FloatingLabelParent, AfterContentInit, Afte
     _shouldForward(prop: keyof AbstractControlDirective): boolean;
     // (undocumented)
     _shouldLabelFloat(): boolean;
-    _subscriptAnimationState: string;
     get subscriptSizing(): SubscriptSizing;
     set subscriptSizing(value: SubscriptSizing);
     // (undocumented)
@@ -148,9 +146,9 @@ export class MatFormField implements FloatingLabelParent, AfterContentInit, Afte
     static ɵfac: i0.ɵɵFactoryDeclaration<MatFormField, never>;
 }
 
-// @public
+// @public @deprecated
 export const matFormFieldAnimations: {
-    readonly transitionMessages: AnimationTriggerMetadata;
+    readonly transitionMessages: any;
 };
 
 // @public

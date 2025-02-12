@@ -6,7 +6,6 @@
 
 import { ActiveDescendantKeyManager } from '@angular/cdk/a11y';
 import { AfterContentInit } from '@angular/core';
-import { AnimationTriggerMetadata } from '@angular/animations';
 import { CdkConnectedOverlay } from '@angular/cdk/overlay';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { ChangeDetectorRef } from '@angular/core';
@@ -81,6 +80,8 @@ export { MatPrefix }
 // @public (undocumented)
 export class MatSelect implements AfterContentInit, OnChanges, OnDestroy, OnInit, DoCheck, ControlValueAccessor, MatFormFieldControl<any> {
     constructor(...args: unknown[]);
+    // (undocumented)
+    protected _animationsDisabled: boolean;
     ariaLabel: string;
     ariaLabelledby: string;
     protected _canOpen(): boolean;
@@ -113,6 +114,7 @@ export class MatSelect implements AfterContentInit, OnChanges, OnDestroy, OnInit
     _getPanelAriaLabelledby(): string | null;
     _getPanelTheme(): string;
     _handleKeydown(event: KeyboardEvent): void;
+    protected _handleOverlayKeydown(event: KeyboardEvent): void;
     get hideSingleSelectionIndicator(): boolean;
     set hideSingleSelectionIndicator(value: boolean);
     get id(): string;
@@ -151,7 +153,6 @@ export class MatSelect implements AfterContentInit, OnChanges, OnDestroy, OnInit
     ngOnDestroy(): void;
     // (undocumented)
     ngOnInit(): void;
-    _onAttached(): void;
     _onBlur(): void;
     _onChange: (value: any) => void;
     onContainerClick(): void;
@@ -172,8 +173,6 @@ export class MatSelect implements AfterContentInit, OnChanges, OnDestroy, OnInit
     panelClass: string | string[] | Set<string> | {
         [key: string]: any;
     };
-    protected _panelDoneAnimating(isOpen: boolean): void;
-    readonly _panelDoneAnimatingStream: Subject<string>;
     get panelOpen(): boolean;
     panelWidth: string | number | null;
     // (undocumented)
@@ -217,10 +216,10 @@ export class MatSelect implements AfterContentInit, OnChanges, OnDestroy, OnInit
     static ɵfac: i0.ɵɵFactoryDeclaration<MatSelect, never>;
 }
 
-// @public
+// @public @deprecated
 export const matSelectAnimations: {
-    readonly transformPanelWrap: AnimationTriggerMetadata;
-    readonly transformPanel: AnimationTriggerMetadata;
+    readonly transformPanelWrap: any;
+    readonly transformPanel: any;
 };
 
 // @public
