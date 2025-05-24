@@ -1,10 +1,9 @@
 @use '@angular/cdk';
-@use './m2-progress-bar';
+@use './m3-progress-bar';
 @use '../core/tokens/token-utils';
 @use '../core/style/vendor-prefixes';
 
-$token-prefix: m2-progress-bar.$prefix;
-$token-slots: m2-progress-bar.get-token-slots();
+$fallbacks: m3-progress-bar.get-tokens();
 
 .mat-mdc-progress-bar {
   // Explicitly set to `block` since the browser defaults custom elements to `inline`.
@@ -44,11 +43,9 @@ $token-slots: m2-progress-bar.get-token-slots();
   overflow-x: hidden;
   transition: opacity 250ms 0ms cubic-bezier(0.4, 0, 0.6, 1);
 
-  @include token-utils.use-tokens($token-prefix, $token-slots) {
-    $track-variable: token-utils.slot(track-height);
-    $indicator-height-variable: token-utils.slot(active-indicator-height);
-    height: max(#{$track-variable}, #{$indicator-height-variable});
-  }
+  $track-variable: token-utils.slot(progress-bar-track-height, $fallbacks);
+  $indicator-height-variable: token-utils.slot(progress-bar-active-indicator-height, $fallbacks);
+  height: max(#{$track-variable}, #{$indicator-height-variable});
 
   @include cdk.high-contrast {
     outline-color: CanvasText;
@@ -64,10 +61,7 @@ $token-slots: m2-progress-bar.get-token-slots();
   animation: none;
   transform-origin: top left;
   transition: transform 250ms 0ms cubic-bezier(0.4, 0, 0.6, 1);
-
-  @include token-utils.use-tokens($token-prefix, $token-slots) {
-    height: token-utils.slot(active-indicator-height);
-  }
+  height: token-utils.slot(progress-bar-active-indicator-height, $fallbacks);
 
   .mdc-linear-progress--indeterminate & {
     transition: none;
@@ -85,11 +79,8 @@ $token-slots: m2-progress-bar.get-token-slots();
   width: 100%;
   animation: none;
   border-top-style: solid;
-
-  @include token-utils.use-tokens($token-prefix, $token-slots) {
-    border-color: token-utils.slot(active-indicator-color);
-    border-top-width: token-utils.slot(active-indicator-height);
-  }
+  border-color: token-utils.slot(progress-bar-active-indicator-color, $fallbacks);
+  border-top-width: token-utils.slot(progress-bar-active-indicator-height, $fallbacks);
 }
 
 .mdc-linear-progress__buffer {
@@ -100,11 +91,8 @@ $token-slots: m2-progress-bar.get-token-slots();
   margin: auto 0;
   width: 100%;
   overflow: hidden;
-
-  @include token-utils.use-tokens($token-prefix, $token-slots) {
-    height: token-utils.slot(track-height);
-    border-radius: token-utils.slot(track-shape);
-  }
+  height: token-utils.slot(progress-bar-track-height, $fallbacks);
+  border-radius: token-utils.slot(progress-bar-track-shape, $fallbacks);
 }
 
 .mdc-linear-progress__buffer-dots {
@@ -118,10 +106,7 @@ $token-slots: m2-progress-bar.get-token-slots();
   flex: auto;
   transform: rotate(180deg);
   animation: mdc-linear-progress-buffering 250ms infinite linear;
-
-  @include token-utils.use-tokens($token-prefix, $token-slots) {
-    background-color: token-utils.slot(track-color);
-  }
+  background-color: token-utils.slot(progress-bar-track-color, $fallbacks);
 
   @include cdk.high-contrast {
     background-color: ButtonBorder;
@@ -136,10 +121,7 @@ $token-slots: m2-progress-bar.get-token-slots();
 .mdc-linear-progress__buffer-bar {
   flex: 0 1 100%;
   transition: flex-basis 250ms 0ms cubic-bezier(0.4, 0, 0.6, 1);
-
-  @include token-utils.use-tokens($token-prefix, $token-slots) {
-    background-color: token-utils.slot(track-color);
-  }
+  background-color: token-utils.slot(progress-bar-track-color, $fallbacks);
 }
 
 .mdc-linear-progress__primary-bar {
@@ -199,10 +181,8 @@ $token-slots: m2-progress-bar.get-token-slots();
 
 @keyframes mdc-linear-progress-buffering {
   from {
-    @include token-utils.use-tokens($token-prefix, $token-slots) {
-      $track-variable: token-utils.slot(track-height);
-      transform: rotate(180deg) translateX(calc(#{$track-variable} * -2.5));
-    }
+    $track-variable: token-utils.slot(progress-bar-track-height, $fallbacks);
+    transform: rotate(180deg) translateX(calc(#{$track-variable} * -2.5));
   }
 }
 

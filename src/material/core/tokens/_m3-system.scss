@@ -16,13 +16,10 @@
 @use '../../toolbar/m3-toolbar';
 @use '../../tree/m3-tree';
 @use '../style/elevation';
-@use '../style/sass-utils';
 @use '../theming/config-validation';
 @use '../theming/definition';
 @use '../theming/palettes';
 @use './m3';
-@use './m3-tokens';
-@use 'sass:list';
 @use 'sass:map';
 @use 'sass:meta';
 
@@ -64,9 +61,40 @@
       $color: map.set($color, theme-type, color-scheme);
     }
 
-    $color-config: if($is-palette,
-            definition.define-colors((primary: $color, theme-type: color-scheme)),
-            definition.define-colors($color));
+    $color-config: $color;
+    @if ($is-palette) {
+      $color: map.set($color, tertiary, $color);
+      $color-config: (
+        definition.$internals: (
+          palettes: (
+            primary: map.remove($color, neutral, neutral-variant, secondary),
+            secondary: map.get($color, secondary),
+            tertiary: map.remove($color, neutral, neutral-variant, secondary, error),
+            neutral: map.get($color, neutral),
+            neutral-variant: map.get($color, neutral-variant),
+            error: map.get($color, error),
+          ),
+          theme-type: color-scheme,
+        )
+      );
+    } @else {
+      $primary: map.get($color, primary) or palettes.$violet-palette;
+      $tertiary: map.get($color, tertiary) or $primary;
+      $color-config: (
+        definition.$internals: (
+          palettes: (
+            primary: map.remove($primary, neutral, neutral-variant, secondary),
+            secondary: map.get($primary, secondary),
+            tertiary: map.remove($tertiary, neutral, neutral-variant, secondary, error),
+            neutral: map.get($primary, neutral),
+            neutral-variant: map.get($primary, neutral-variant),
+            error: map.get($primary, error),
+          ),
+          theme-type: map.get($color, theme-type),
+        )
+      );
+    }
+
     @include system-level-colors($color-config, $overrides, definition.$system-fallback-prefix);
     @include system-level-elevation($color-config, $overrides, definition.$system-fallback-prefix);
   }
@@ -74,9 +102,31 @@
   $typography: map.get($config, typography);
   $typography-config: null;
   @if ($typography) {
-    $typography-config: if(meta.type-of($typography) == 'map',
-      definition.define-typography($typography),
-      definition.define-typography((plain-family: $typography)));
+    $plain: (Roboto, sans-serif);
+    $brand: $plain;
+    $bold: 700;
+    $medium: 500;
+    $regular: 400;
+    @if (meta.type-of($typography) == map) {
+      $plain: map.get($typography, plain-family);
+      $brand: map.get($typography, brand-family) or $plain;
+      $bold: map.get($typography, bold-weight) or $bold;
+      $medium: map.get($typography, medium-weight) or $medium;
+      $regular: map.get($typography, regular-weight) or $regular;
+    } @else {
+      $plain: $typography;
+    }
+    $typography-config: (
+      definition.$internals: (
+        font-definition: (
+          plain: $plain,
+          brand: $brand,
+          bold: $bold,
+          medium: $medium,
+          regular: $regular,
+        )
+      )
+    );
     @include system-level-typography(
         $typography-config, $overrides, definition.$system-fallback-prefix);
   }
@@ -84,17 +134,19 @@
   $density: map.get($config, density);
   $density-config: null;
   @if ($density) {
-    $density-config: if(meta.type-of($density) == 'map',
-      definition.define-density($density),
-      definition.define-density((scale: $density)));
-    $scale: map.get($density-config, _mat-theming-internals-do-not-access, density-scale);
+    $scale: 0;
+    @if (meta.type-of($density) == map) {
+      $scale: map.get($density, scale);
+    } @else {
+      $scale: $density;
+    }
     @if ($scale != 0) {
       // Emit component-level density tokens if the scale is lower than 0. The density tokens
       // do not fallback to any system-level values and must be defined if the scale is different.
       $density-tokens: get-density-tokens($scale);
-      @each $prefix, $tokens in $density-tokens {
+      @each $tokens in $density-tokens {
         @each $token-name, $token-value in $tokens {
-          --#{list.nth($prefix, 1)}-#{list.nth($prefix, 2)}-#{$token-name}: #{$token-value};
+          --mat-#{$token-name}: #{$token-value};
         }
       }
     }
@@ -107,23 +159,23 @@
 // Gets all density-related tokens from the components.
 @function get-density-tokens($scale) {
   @return (
-    m3-checkbox.$prefix: m3-checkbox.get-density-tokens($scale),
-    m3-chip.$prefix: m3-chip.get-density-tokens($scale),
-    m3-expansion.$prefix: m3-expansion.get-density-tokens($scale),
-    m3-fab.$prefix: m3-fab.get-density-tokens($scale),
-    m3-button.$prefix: m3-button.get-density-tokens($scale),
-    m3-form-field.$prefix: m3-form-field.get-density-tokens($scale),
-    m3-icon-button.$prefix: m3-icon-button.get-density-tokens($scale),
-    m3-list.$prefix: m3-list.get-density-tokens($scale),
-    m3-paginator.$prefix: m3-paginator.get-density-tokens($scale),
-    m3-radio.$prefix: m3-radio.get-density-tokens($scale),
-    m3-tabs.$prefix: m3-tabs.get-density-tokens($scale),
-    m3-select.$prefix: m3-select.get-density-tokens($scale),
-    m3-button-toggle.$prefix: m3-button-toggle.get-density-tokens($scale),
-    m3-stepper.$prefix: m3-stepper.get-density-tokens($scale),
-    m3-table.$prefix: m3-table.get-density-tokens($scale),
-    m3-toolbar.$prefix: m3-toolbar.get-density-tokens($scale),
-    m3-tree.$prefix: m3-tree.get-density-tokens($scale),
+    m3-checkbox.get-density-tokens($scale),
+    m3-chip.get-density-tokens($scale),
+    m3-expansion.get-density-tokens($scale),
+    m3-fab.get-density-tokens($scale),
+    m3-button.get-density-tokens($scale),
+    m3-form-field.get-density-tokens($scale),
+    m3-icon-button.get-density-tokens($scale),
+    m3-list.get-density-tokens($scale),
+    m3-paginator.get-density-tokens($scale),
+    m3-radio.get-density-tokens($scale),
+    m3-tabs.get-density-tokens($scale),
+    m3-select.get-density-tokens($scale),
+    m3-button-toggle.get-density-tokens($scale),
+    m3-stepper.get-density-tokens($scale),
+    m3-table.get-density-tokens($scale),
+    m3-toolbar.get-density-tokens($scale),
+    m3-tree.get-density-tokens($scale),
   );
 }
 
@@ -153,11 +205,11 @@
 }
 
 @mixin system-level-colors($theme, $overrides: (), $prefix: null) {
-  $palettes: map.get($theme, _mat-theming-internals-do-not-access, palettes);
-  $type: map.get($theme, _mat-theming-internals-do-not-access, theme-type);
+  $palettes: map.get($theme, definition.$internals, palettes);
+  $type: map.get($theme, definition.$internals, theme-type);
 
   @if (not $prefix) {
-    $prefix: map.get($theme, _mat-theming-internals-do-not-access,
+    $prefix: map.get($theme, definition.$internals,
         color-system-variables-prefix) or definition.$system-level-prefix;
   }
 
@@ -201,10 +253,10 @@
 }
 
 @mixin system-level-typography($theme, $overrides: (), $prefix: null) {
-  $font-definition: map.get($theme, _mat-theming-internals-do-not-access, font-definition);
+  $font-definition: map.get($theme, definition.$internals, font-definition);
 
   @if (not $prefix) {
-    $prefix: map.get($theme, _mat-theming-internals-do-not-access,
+    $prefix: map.get($theme, definition.$internals,
         typography-system-variables-prefix) or definition.$system-level-prefix;
   }
 
@@ -217,7 +269,7 @@
 
 @mixin system-level-elevation($theme, $overrides: (), $prefix: definition.$system-level-prefix) {
   $shadow-color: map.get(
-      $theme, _mat-theming-internals-do-not-access, color-tokens, (mat, theme), shadow);
+      $theme, definition.$internals, palettes, neutral, 0);
 
   @each $name, $value in m3.md-sys-elevation-values() {
     $level: map.get($overrides, $name) or $value;
@@ -242,56 +294,6 @@
       --#{$prefix}-#{$name}: #{map.get($overrides, $name) or $value};
     }
   }
-}
-
-// Return a new map where the values are the same as the provided map's
-// keys, prefixed with "--mat-sys-". For example:
-// (key1: '', key2: '') --> (key1: --mat-sys-key1, key2: --mat-sys-key2)
-@function _create-system-app-vars-map($map) {
-  $new-map: ();
-  @each $key, $value in $map {
-    $new-map: map.set($new-map, $key, --#{definition.$system-fallback-prefix}-#{$key});
-  }
-  @return $new-map;
-}
-
-// Create a components tokens map where values are based on
-// system fallback variables referencing Material's system keys.
-// Includes density token fallbacks where density is 0.
-@function create-system-fallbacks() {
-  $palettes: m3.md-sys-color-values-light(palettes.$blue-palette);
-  $palettes: map.set($palettes, primary, palettes.$blue-palette);
-  $app-vars: (
-    'md-sys-color':
-        _create-system-app-vars-map(m3.md-sys-color-values-light($palettes)),
-    'md-sys-typescale':
-        _create-system-app-vars-map(m3.md-sys-typescale-values((
-          brand: (Roboto),
-          plain: (Roboto),
-          bold: 700,
-          medium: 500,
-          regular: 400
-        ))),
-    'md-sys-elevation':
-        _create-system-app-vars-map(m3.md-sys-elevation-values()),
-    'md-sys-state':
-        _create-system-app-vars-map(m3.md-sys-state-values()),
-    'md-sys-shape':
-        _create-system-app-vars-map(m3.md-sys-shape-values()),
-    // Add a subset of palette-specific colors used by components instead of system values
-    'md-ref-palette':
-        _create-system-app-vars-map(
-          (
-            neutral10: '', // Form field native select option text color
-            neutral-variant20: '', // Sidenav scrim (container background shadow when opened),
-          )
-        ),
-  );
-
-  @return sass-utils.deep-merge-all(
-      m3-tokens.generate-tokens($app-vars, true, true),
-      get-density-tokens(0),
-  );
 }
 
 /// Creates a single merged map from the provided variable-length map arguments

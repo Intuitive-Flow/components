@@ -120,7 +120,15 @@
     warn: if($warn != null, $warn, define-palette(palette.$red-palette)),
     is-dark: false,
     foreground: palette.$light-theme-foreground-palette,
-    background: palette.$light-theme-background-palette
+    background: palette.$light-theme-background-palette,
+    system: (
+      surface: white,
+      on-surface: rgba(black, 0.87),
+      outline: rgba(black, 0.12),
+      hover-state-layer-opacity: 0.04,
+      focus-state-layer-opacity: 0.12,
+      pressed-state-layer-opacity: 0.12,
+    ),
   );
 }
 
@@ -133,7 +141,15 @@
     warn: if($warn != null, $warn, define-palette(palette.$red-palette)),
     is-dark: true,
     foreground: palette.$dark-theme-foreground-palette,
-    background: palette.$dark-theme-background-palette
+    background: palette.$dark-theme-background-palette,
+    system: (
+      surface: map.get(palette.$grey-palette, 800),
+      on-surface: white,
+      outline: rgba(white, 0.12),
+      hover-state-layer-opacity: 0.04,
+      focus-state-layer-opacity: 0.12,
+      pressed-state-layer-opacity: 0.12,
+    ),
   );
 }
 

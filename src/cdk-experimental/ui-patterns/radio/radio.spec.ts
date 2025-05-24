@@ -33,7 +33,6 @@ describe('RadioGroup Pattern', () => {
       items: inputs.items,
       value: inputs.value ?? signal([]),
       activeIndex: inputs.activeIndex ?? signal(0),
-      wrap: inputs.wrap ?? signal(true),
       readonly: inputs.readonly ?? signal(false),
       disabled: inputs.disabled ?? signal(false),
       skipDisabled: inputs.skipDisabled ?? signal(true),
@@ -134,23 +133,6 @@ describe('RadioGroup Pattern', () => {
       const {radioGroup} = getDefaultPatterns();
       expect(radioGroup.inputs.activeIndex()).toBe(0);
       radioGroup.onKeydown(end());
-      expect(radioGroup.inputs.activeIndex()).toBe(4);
-    });
-
-    it('should wrap navigation when wrap is true', () => {
-      const {radioGroup} = getDefaultPatterns({wrap: signal(true)});
-      radioGroup.onKeydown(up());
-      expect(radioGroup.inputs.activeIndex()).toBe(4);
-      radioGroup.onKeydown(down());
-      expect(radioGroup.inputs.activeIndex()).toBe(0);
-    });
-
-    it('should not wrap navigation when wrap is false', () => {
-      const {radioGroup} = getDefaultPatterns({wrap: signal(false)});
-      radioGroup.onKeydown(up());
-      expect(radioGroup.inputs.activeIndex()).toBe(0);
-      radioGroup.onKeydown(end());
-      radioGroup.onKeydown(down());
       expect(radioGroup.inputs.activeIndex()).toBe(4);
     });
 
@@ -314,6 +296,18 @@ describe('RadioGroup Pattern', () => {
       radioButtons[2].disabled.set(true); // Disable Cherry
       radioGroup.setDefaultState();
       expect(radioGroup.inputs.activeIndex()).toBe(0); // Defaults to first focusable
+    });
+  });
+
+  describe('validate', () => {
+    it('should report a violation if the selected item is disabled and skipDisabled is true', () => {
+      const {radioGroup, radioButtons} = getDefaultPatterns({
+        value: signal(['Banana']),
+        skipDisabled: signal(true),
+      });
+      radioButtons[1].disabled.set(true); // Disable the selected item.
+      const violations = radioGroup.validate();
+      expect(violations.length).toBe(1);
     });
   });
 });

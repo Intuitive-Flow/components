@@ -1,3 +1,69 @@
+<a name="20.0.0-rc.2"></a>
+# 20.0.0-rc.2 "orichalcum-ostrich" (2025-05-21)
+### material
+| Commit | Type | Description |
+| -- | -- | -- |
+| [7d360ac776](https://github.com/angular/components/commit/7d360ac7761520c4382776c2950d47919e59cc21) | fix | **button-toggle:** changed after checked error when updating tabindex ([#31172](https://github.com/angular/components/pull/31172)) |
+| [c17cdadaed](https://github.com/angular/components/commit/c17cdadaed032441cfddbddecf006a4eb1e0b087) | fix | **datepicker:** prevent calendar from stealing away focus ([#31128](https://github.com/angular/components/pull/31128)) |
+| [704761652d](https://github.com/angular/components/commit/704761652dfbaa32283d4dc5ce58ca7c679b217b) | fix | **dialog:** use custom token to disable animations ([#31156](https://github.com/angular/components/pull/31156)) |
+| [8a45ec9280](https://github.com/angular/components/commit/8a45ec9280072c383fa61d799ba500794068e476) | fix | **radio:** assistive technology announcing button as invalid ([#31160](https://github.com/angular/components/pull/31160)) |
+| [e5eb939693](https://github.com/angular/components/commit/e5eb9396935e2c47d20a448719374cc2fc51cd17) | fix | **radio:** updating required value should mark for check ([#31109](https://github.com/angular/components/pull/31109)) |
+| [fa150969b2](https://github.com/angular/components/commit/fa150969b2607cb8f02eda8f4d493828812863ab) | fix | **sidenav:** removes -1 tabindex from sidenav  ([#31155](https://github.com/angular/components/pull/31155)) |
+| [a3711eb091](https://github.com/angular/components/commit/a3711eb09198f466b1ed04593da7e35b0b6e6aca) | fix | **tabs:** avoid not having any focusable tabs ([#31144](https://github.com/angular/components/pull/31144)) |
+| [922c678c07](https://github.com/angular/components/commit/922c678c0790161c5b9dc001393e82fafc607025) | fix | **tabs:** not emitting token in M3 ([#31136](https://github.com/angular/components/pull/31136)) |
+### cdk-experimental
+| Commit | Type | Description |
+| -- | -- | -- |
+| [16493ecab8](https://github.com/angular/components/commit/16493ecab893d522f81b769e059f8fa6138b9e7e) | fix | **scrolling:** Fix ExpressionChangedAfterItWasCheckedError ([#31076](https://github.com/angular/components/pull/31076)) |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
+<a name="19.2.17"></a>
+# 19.2.17 "fulgurite-fiesta" (2025-05-21)
+### material
+| Commit | Type | Description |
+| -- | -- | -- |
+| [0e300d1041](https://github.com/angular/components/commit/0e300d10413056bc53f67dcbd164b5eb8b54572a) | fix | **datepicker:** prevent calendar from stealing away focus ([#31128](https://github.com/angular/components/pull/31128)) |
+| [af04c772ed](https://github.com/angular/components/commit/af04c772ed5cc5d324f7eb937f57e3333b04a6f3) | fix | **dialog:** use custom token to disable animations ([#31156](https://github.com/angular/components/pull/31156)) |
+| [306eef1d74](https://github.com/angular/components/commit/306eef1d74be438735edcff6a3bd1a01ed58aad2) | fix | **radio:** assistive technology announcing button as invalid ([#31160](https://github.com/angular/components/pull/31160)) |
+| [bd614b4a69](https://github.com/angular/components/commit/bd614b4a69c147ece0a0f0eacdac9714567080e1) | fix | **radio:** updating required value should mark for check ([#31109](https://github.com/angular/components/pull/31109)) |
+| [ca231dc9b8](https://github.com/angular/components/commit/ca231dc9b80f7c2711efe74544b6a37945b1c1b4) | fix | **sidenav:** removes -1 tabindex from sidenav  ([#31155](https://github.com/angular/components/pull/31155)) |
+| [33d8f3347e](https://github.com/angular/components/commit/33d8f3347ef56dfc963ad6264b849f0b0dc96a92) | fix | **tabs:** avoid not having any focusable tabs ([#31144](https://github.com/angular/components/pull/31144)) |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
+<a name="20.0.0-rc.1"></a>
+# 20.0.0-rc.1 "plastic-zebra" (2025-05-14)
+### material
+| Commit | Type | Description |
+| -- | -- | -- |
+| [cbffce88e3](https://github.com/angular/components/commit/cbffce88e3b42e0bfb1f7cb36f351703daff2187) | fix | **button-toggle:** use smaller border radius ([#31084](https://github.com/angular/components/pull/31084)) |
+| [aec28e2507](https://github.com/angular/components/commit/aec28e2507e726caed4ff5b663536e9f5ad1ee1c) | fix | **button:** inherit button shape in focus indicator ([#31065](https://github.com/angular/components/pull/31065)) |
+| [fd162d2018](https://github.com/angular/components/commit/fd162d201807670f7eebd6e55fa0ba544a3cabfd) | fix | **schematics:** add schematic to rename tokens ([#31051](https://github.com/angular/components/pull/31051)) |
+| [71a9d88b29](https://github.com/angular/components/commit/71a9d88b29f290f209bc8b21541d99dbb0c39995) | fix | **schematics:** incorrect on-tertiary color being generated ([#31061](https://github.com/angular/components/pull/31061)) |
+| [10a6ea493b](https://github.com/angular/components/commit/10a6ea493bf8fd845a7fec81ff2036488812d67f) | perf | **form-field:** split DOM accesses into read and write ([#31086](https://github.com/angular/components/pull/31086)) |
+### cdk-experimental
+| Commit | Type | Description |
+| -- | -- | -- |
+| [08ccf3c685](https://github.com/angular/components/commit/08ccf3c68543d4aad0e5794a77c99d7ce8f1488b) | fix | **column-resize:** Obscure weird behavior in tables that are too wide by conditionally disabling resize ([#31100](https://github.com/angular/components/pull/31100)) |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
+<a name="19.2.16"></a>
+# 19.2.16 "metal-monkey" (2025-05-14)
+### material
+| Commit | Type | Description |
+| -- | -- | -- |
+| [08f5fda901](https://github.com/angular/components/commit/08f5fda901c169250e934e6a8aed9248bac08303) | fix | **button-toggle:** use smaller border radius ([#31084](https://github.com/angular/components/pull/31084)) |
+| [68928e58aa](https://github.com/angular/components/commit/68928e58aa9a4588e88dbf04c50c1bf9828c9798) | fix | **button:** inherit button shape in focus indicator ([#31065](https://github.com/angular/components/pull/31065)) |
+| [6abe7510b2](https://github.com/angular/components/commit/6abe7510b271a4edbdd566b059c6c6fc90edad8c) | fix | **schematics:** incorrect on-tertiary color being generated ([#31061](https://github.com/angular/components/pull/31061)) |
+### cdk-experimental
+| Commit | Type | Description |
+| -- | -- | -- |
+| [af0b4638f2](https://github.com/angular/components/commit/af0b4638f2a55d4e8280c12a66f5eb9a0c949d9c) | fix | **column-resize:** Obscure weird behavior in tables that are too wide by conditionally disabling resize ([#31100](https://github.com/angular/components/pull/31100)) |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.0.0-rc.0"></a>
 # 20.0.0-rc.0 "aluminium-axe" (2025-05-07)
 ### cdk-experimental

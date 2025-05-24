@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import {computed, signal} from '@angular/core';
+import {computed} from '@angular/core';
 import {KeyboardEventManager} from '../behaviors/event-manager/keyboard-event-manager';
 import {PointerEventManager} from '../behaviors/event-manager/pointer-event-manager';
 import {ListFocus, ListFocusInputs} from '../behaviors/list-focus/list-focus';
@@ -21,7 +21,7 @@ interface SelectOptions {
 }
 
 /** Represents the required inputs for a radio group. */
-export type RadioGroupInputs<V> = ListNavigationInputs<RadioButtonPattern<V>> &
+export type RadioGroupInputs<V> = Omit<ListNavigationInputs<RadioButtonPattern<V>>, 'wrap'> &
   // Radio groups are always single-select.
   Omit<ListSelectionInputs<RadioButtonPattern<V>, V>, 'multi' | 'selectionMode'> &
   ListFocusInputs<RadioButtonPattern<V>> & {
@@ -48,8 +48,11 @@ export class RadioGroupPattern<V> {
   /** Whether the radio group is disabled. */
   disabled = computed(() => this.inputs.disabled() || this.focusManager.isListDisabled());
 
+  /** The currently selected radio button. */
+  selectedItem = computed(() => this.selection.selectedItems()[0]);
+
   /** Whether the radio group is readonly. */
-  readonly: SignalLike<boolean>;
+  readonly = computed(() => this.selectedItem()?.disabled() || this.inputs.readonly());
 
   /** The tabindex of the radio group (if using activedescendant). */
   tabindex = computed(() => this.focusManager.getListTabindex());
@@ -111,16 +114,18 @@ export class RadioGroupPattern<V> {
   });
 
   constructor(readonly inputs: RadioGroupInputs<V>) {
-    this.readonly = inputs.readonly;
     this.orientation = inputs.orientation;
 
     this.focusManager = new ListFocus(inputs);
-    this.navigation = new ListNavigation({...inputs, focusManager: this.focusManager});
+    this.navigation = new ListNavigation({
+      ...inputs,
+      wrap: () => false,
+      focusManager: this.focusManager,
+    });
     this.selection = new ListSelection({
       ...inputs,
-      // Radio groups are always single-select and selection follows focus.
-      multi: signal(false),
-      selectionMode: signal('follow'),
+      multi: () => false,
+      selectionMode: () => 'follow',
       focusManager: this.focusManager,
     });
   }
@@ -189,6 +194,19 @@ export class RadioGroupPattern<V> {
     if (firstItem) {
       this.inputs.activeIndex.set(firstItem.index());
     }
+  }
+
+  /** Validates the state of the radio group and returns a list of accessibility violations. */
+  validate(): string[] {
+    const violations: string[] = [];
+
+    if (this.selectedItem()?.disabled() && this.inputs.skipDisabled()) {
+      violations.push(
+        "Accessibility Violation: The selected radio button is disabled while 'skipDisabled' is true, making the selection unreachable via keyboard.",
+      );
+    }
+
+    return violations;
   }
 
   /** Safely performs a navigation operation and updates selection if needed. */
