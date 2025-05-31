@@ -1,10 +1,12 @@
 # List of all entry-points of the Angular cdk-experimental package.
 CDK_EXPERIMENTAL_ENTRYPOINTS = [
+    "accordion",
     "column-resize",
     "combobox",
     "deferred-content",
     "listbox",
     "popover-edit",
+    "radio",
     "scrolling",
     "selection",
     "tabs",

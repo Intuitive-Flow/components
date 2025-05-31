@@ -85,14 +85,16 @@
   // might be inferred as numbers by Sass. Casting them to string fixes the map lookup.
   $color: if(map.has-key($palette, $hue), map.get($palette, $hue), map.get($palette, $hue + ''));
 
-  @if (meta.type-of($color) != color) {
-    // If the $color resolved to something different from a color (e.g. a CSS variable),
-    // we can't apply the opacity anyway so we return the value as is, otherwise Sass can
-    // throw an error or output something invalid.
+  @if ($opacity == null) {
     @return $color;
   }
 
-  @return rgba($color, if($opacity == null, color.opacity($color), $opacity));
+  @if (meta.type-of($color) != color) {
+    $opacity: ($opacity * 100) + '%';
+    @return #{color-mix(in srgb, #{$color} #{$opacity}, transparent)};
+  }
+
+  @return rgba($color, $opacity);
 }
 
 // Validates the specified theme by ensuring that the optional color config defines
@@ -120,7 +122,19 @@
     warn: if($warn != null, $warn, define-palette(palette.$red-palette)),
     is-dark: false,
     foreground: palette.$light-theme-foreground-palette,
-    background: palette.$light-theme-background-palette
+    background: palette.$light-theme-background-palette,
+    system: (
+      surface: white,
+      on-surface: rgba(black, 0.87),
+      on-surface-variant: rgba(black, 0.54),
+      background: map.get(palette.$grey-palette, 50),
+      inverse-surface: map.get(palette.$grey-palette, 800),
+      inverse-on-surface: white,
+      outline: rgba(black, 0.12),
+      hover-state-layer-opacity: 0.04,
+      focus-state-layer-opacity: 0.12,
+      pressed-state-layer-opacity: 0.12,
+    ),
   );
 }
 
@@ -133,7 +147,19 @@
     warn: if($warn != null, $warn, define-palette(palette.$red-palette)),
     is-dark: true,
     foreground: palette.$dark-theme-foreground-palette,
-    background: palette.$dark-theme-background-palette
+    background: palette.$dark-theme-background-palette,
+    system: (
+      surface: map.get(palette.$grey-palette, 800),
+      on-surface: white,
+      on-surface-variant: rgba(white, 0.7),
+      background: #303030,
+      inverse-surface: white,
+      inverse-on-surface: rgba(black, 0.87),
+      outline: rgba(white, 0.12),
+      hover-state-layer-opacity: 0.04,
+      focus-state-layer-opacity: 0.12,
+      pressed-state-layer-opacity: 0.12,
+    ),
   );
 }
 

@@ -1,13 +1,12 @@
 @use 'sass:color';
 @use 'sass:meta';
 @use 'sass:math';
-@use '../core/tokens/m2-utils';
 @use '../core/theming/inspection';
 @use '../core/style/elevation';
 @use '../core/style/sass-utils';
-
-// The prefix used to generate the fully qualified name for tokens in this file.
-$prefix: (mat, datepicker);
+@use '../core/tokens/m3-utils';
+@use '../core/tokens/m2-utils';
+@use 'sass:map';
 
 $_selected-fade-amount: 0.6;
 $_today-fade-amount: 0.2;
@@ -32,22 +31,21 @@ $private-default-overlap-color: #a8dab5;
 // but may be in a future version of the theming API.
 @function get-unthemable-tokens() {
   @return (
-    calendar-container-shape: 4px,
-    calendar-container-touch-shape: 4px,
-    calendar-container-elevation-shadow: elevation.get-box-shadow(4),
-    calendar-container-touch-elevation-shadow: elevation.get-box-shadow(24),
+    datepicker-calendar-container-shape: 4px,
+    datepicker-calendar-container-touch-shape: 4px,
+    datepicker-calendar-container-elevation-shadow: elevation.get-box-shadow(4),
+    datepicker-calendar-container-touch-elevation-shadow: elevation.get-box-shadow(24),
   );
 }
 
 // Tokens that can be configured through Angular Material's color theming API.
 @function get-color-tokens($theme) {
+  $system: m2-utils.get-system($theme);
+
   $inactive-icon-color: inspection.get-theme-color($theme, foreground, icon);
-  $text-color: inspection.get-theme-color($theme, foreground, text);
-  $secondary-text-color: inspection.get-theme-color($theme, foreground, secondary-text);
-  $disabled-text-color: inspection.get-theme-color($theme, foreground, disabled-text);
-  $divider-color: inspection.get-theme-color($theme, foreground, divider);
+  $disabled: m3-utils.color-with-opacity(map.get($system, on-surface), 38%);
   $hint-text-color: inspection.get-theme-color($theme, foreground, hint-text);
-  $preview-outline-color: $divider-color;
+  $preview-outline-color: map.get($system, outline);
   $today-disabled-outline-color: null;
   $is-dark: inspection.get-theme-type($theme) == dark;
 
@@ -68,33 +66,32 @@ $private-default-overlap-color: #a8dab5;
     $today-disabled-outline-color: color.adjust($hint-text-color, $alpha: -$_today-fade-amount);
   }
   @else {
-    $today-disabled-outline-color: $disabled-text-color;
+    $today-disabled-outline-color: $disabled;
   }
 
   @return sass-utils.merge-all($calendar-tokens, $toggle-tokens, $range-tokens, (
-    toggle-icon-color: $inactive-icon-color,
-    calendar-body-label-text-color: $secondary-text-color,
-    calendar-period-button-text-color: inspection.get-theme-color($theme, foreground, text, 1),
-    calendar-period-button-icon-color: $inactive-icon-color,
-    calendar-navigation-button-icon-color: $inactive-icon-color,
-    calendar-header-divider-color: $divider-color,
-    calendar-header-text-color: $secondary-text-color,
+    datepicker-toggle-icon-color: $inactive-icon-color,
+    datepicker-calendar-body-label-text-color: map.get($system, on-surface-variant),
+    datepicker-calendar-period-button-text-color:
+        inspection.get-theme-color($theme, foreground, base),
+    datepicker-calendar-period-button-icon-color: $inactive-icon-color,
+    datepicker-calendar-navigation-button-icon-color: $inactive-icon-color,
+    datepicker-calendar-header-divider-color: map.get($system, outline),
+    datepicker-calendar-header-text-color: map.get($system, on-surface-variant),
 
     // Note: though it's not text, the border is a hint about the fact
     // that this is today's date, so we use the hint color.
-    calendar-date-today-outline-color: $hint-text-color,
-    calendar-date-today-disabled-state-outline-color: $today-disabled-outline-color,
-    calendar-date-text-color: $text-color,
-    calendar-date-outline-color: transparent,
-    calendar-date-disabled-state-text-color: $disabled-text-color,
-    calendar-date-preview-state-outline-color: $preview-outline-color,
-
-    range-input-separator-color: $text-color,
-    range-input-disabled-state-separator-color: $disabled-text-color,
-    range-input-disabled-state-text-color: $disabled-text-color,
-
-    calendar-container-background-color: inspection.get-theme-color($theme, background, card),
-    calendar-container-text-color: $text-color,
+    datepicker-calendar-date-today-outline-color: $hint-text-color,
+    datepicker-calendar-date-today-disabled-state-outline-color: $today-disabled-outline-color,
+    datepicker-calendar-date-text-color: map.get($system, on-surface),
+    datepicker-calendar-date-outline-color: transparent,
+    datepicker-calendar-date-disabled-state-text-color: $disabled,
+    datepicker-calendar-date-preview-state-outline-color: $preview-outline-color,
+    datepicker-range-input-separator-color: map.get($system, on-surface),
+    datepicker-range-input-disabled-state-separator-color: $disabled,
+    datepicker-range-input-disabled-state-text-color: $disabled,
+    datepicker-calendar-container-background-color: map.get($system, surface),
+    datepicker-calendar-container-text-color: map.get($system, on-surface),
   ));
 }
 
@@ -105,18 +102,22 @@ $private-default-overlap-color: #a8dab5;
     // an element (e.g. size, weight, line height, letter spacing). These tokens only set the values
     // that were set in the previous theming API to reduce the amount of subtle screenshot
     // differences. We should look into introducing the other tokens in a follow-up.
-    calendar-text-font: inspection.get-theme-typography($theme, body-1, font-family),
-    calendar-text-size: 13px,
+    datepicker-calendar-text-font: inspection.get-theme-typography($theme, body-1, font-family),
+    datepicker-calendar-text-size: 13px,
 
-    calendar-body-label-text-size: inspection.get-theme-typography($theme, button, font-size),
-    calendar-body-label-text-weight: inspection.get-theme-typography($theme, button, font-weight),
+    datepicker-calendar-body-label-text-size:
+        inspection.get-theme-typography($theme, button, font-size),
+    datepicker-calendar-body-label-text-weight:
+        inspection.get-theme-typography($theme, button, font-weight),
 
-    calendar-period-button-text-size: inspection.get-theme-typography($theme, button, font-size),
-    calendar-period-button-text-weight: inspection.get-theme-typography(
-        $theme, button, font-weight),
+    datepicker-calendar-period-button-text-size:
+        inspection.get-theme-typography($theme, button, font-size),
+    datepicker-calendar-period-button-text-weight:
+        inspection.get-theme-typography($theme, button, font-weight),
 
-    calendar-header-text-size: 11px,
-    calendar-header-text-weight: inspection.get-theme-typography($theme, body-1, font-weight),
+    datepicker-calendar-header-text-size: 11px,
+    datepicker-calendar-header-text-weight:
+        inspection.get-theme-typography($theme, body-1, font-weight),
   );
 }
 
@@ -128,39 +129,42 @@ $private-default-overlap-color: #a8dab5;
   $overlap-selected-color: private-get-default-overlap-selected-color($overlap-color)) {
 
   @return (
-    calendar-date-in-range-state-background-color: $range-color,
-    calendar-date-in-comparison-range-state-background-color: $comparison-color,
-    calendar-date-in-overlap-range-state-background-color: $overlap-color,
-    calendar-date-in-overlap-range-selected-state-background-color: $overlap-selected-color,
+    datepicker-calendar-date-in-range-state-background-color: $range-color,
+    datepicker-calendar-date-in-comparison-range-state-background-color: $comparison-color,
+    datepicker-calendar-date-in-overlap-range-state-background-color: $overlap-color,
+    datepicker-calendar-date-in-overlap-range-selected-state-background-color:
+        $overlap-selected-color,
   );
 }
 
 @function private-get-calendar-color-palette-color-tokens($theme, $palette-name) {
+  $system: m2-utils.get-system($theme);
   $palette-color: inspection.get-theme-color($theme, $palette-name);
   $default-contrast: inspection.get-theme-color($theme, $palette-name, default-contrast);
-  $active-background-color: sass-utils.safe-color-change($palette-color, $alpha: 0.3);
+  $active-background-color: inspection.get-theme-color($theme, $palette-name, 0.3);
   $active-disabled-color: null;
 
   @if (meta.type-of($palette-color) == color) {
     $active-disabled-color: color.adjust($palette-color, $alpha: -$_selected-fade-amount);
   }
   @else {
-    $active-disabled-color: inspection.get-theme-color($theme, foreground, disabled-button);
+    $active-disabled-color: m3-utils.color-with-opacity(map.get($system, on-surface), 38%);
   }
 
   @return (
-    calendar-date-selected-state-text-color: $default-contrast,
-    calendar-date-selected-state-background-color: $palette-color,
-    calendar-date-selected-disabled-state-background-color: $active-disabled-color,
-    calendar-date-today-selected-state-outline-color: $default-contrast,
-    calendar-date-focus-state-background-color: $active-background-color,
-    calendar-date-hover-state-background-color: $active-background-color,
+    datepicker-calendar-date-selected-state-text-color: $default-contrast,
+    datepicker-calendar-date-selected-state-background-color: $palette-color,
+    datepicker-calendar-date-selected-disabled-state-background-color: $active-disabled-color,
+    datepicker-calendar-date-today-selected-state-outline-color: $default-contrast,
+    datepicker-calendar-date-focus-state-background-color: $active-background-color,
+    datepicker-calendar-date-hover-state-background-color: $active-background-color,
   );
 }
 
 @function private-get-toggle-color-palette-color-tokens($theme, $palette-name) {
   @return (
-    toggle-active-state-icon-color: inspection.get-theme-color($theme, $palette-name, text),
+    datepicker-toggle-active-state-icon-color:
+        inspection.get-theme-color($theme, $palette-name, text),
   );
 }
 
@@ -168,15 +172,4 @@ $private-default-overlap-color: #a8dab5;
 // Tokens that can be configured through Angular Material's density theming API.
 @function get-density-tokens($theme) {
   @return ();
-}
-
-// Combines the tokens generated by the above functions into a single map with placeholder values.
-// This is used to create token slots.
-@function get-token-slots() {
-  @return sass-utils.deep-merge-all(
-      get-unthemable-tokens(),
-      get-color-tokens(m2-utils.$placeholder-color-config),
-      get-typography-tokens(m2-utils.$placeholder-typography-config),
-      get-density-tokens(m2-utils.$placeholder-density-config)
-  );
 }
