@@ -1,19 +1,21 @@
-import {Directionality} from '@angular/cdk/bidi';
 import {ENTER, SPACE} from '@angular/cdk/keycodes';
-import {dispatchFakeEvent, dispatchKeyboardEvent} from '@angular/cdk/testing/private';
+import {
+  dispatchFakeEvent,
+  dispatchKeyboardEvent,
+  provideFakeDirectionality,
+} from '@angular/cdk/testing/private';
 import {Component, DebugElement, ViewChild} from '@angular/core';
 import {ComponentFixture, TestBed, fakeAsync, flush, waitForAsync} from '@angular/core/testing';
-import {MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions} from '../core';
 import {By} from '@angular/platform-browser';
-import {Subject} from 'rxjs';
+import {MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions} from '../core';
 import {
   MAT_CHIPS_DEFAULT_OPTIONS,
+  MatChipAvatar,
   MatChipEvent,
   MatChipListbox,
   MatChipOption,
   MatChipSelectionChange,
   MatChipsDefaultOptions,
-  MatChipsModule,
 } from './index';
 
 describe('Option Chips', () => {
@@ -23,7 +25,6 @@ describe('Option Chips', () => {
   let primaryAction: HTMLElement;
   let chipInstance: MatChipOption;
   let globalRippleOptions: RippleGlobalOptions;
-  let dir = 'ltr';
 
   let hideSingleSelectionIndicator: boolean | undefined;
 
@@ -35,19 +36,11 @@ describe('Option Chips', () => {
     };
 
     TestBed.configureTestingModule({
-      imports: [MatChipsModule],
       providers: [
         {provide: MAT_RIPPLE_GLOBAL_OPTIONS, useFactory: () => globalRippleOptions},
-        {
-          provide: Directionality,
-          useFactory: () => ({
-            value: dir,
-            change: new Subject(),
-          }),
-        },
+        provideFakeDirectionality('ltr'),
         {provide: MAT_CHIPS_DEFAULT_OPTIONS, useFactory: () => defaultOptions},
       ],
-      declarations: [SingleChip],
     });
   }));
 
@@ -424,7 +417,7 @@ describe('Option Chips', () => {
         </div>
       }
     </mat-chip-listbox>`,
-  standalone: false,
+  imports: [MatChipListbox, MatChipOption, MatChipAvatar],
 })
 class SingleChip {
   @ViewChild(MatChipListbox) chipList: MatChipListbox;

@@ -19,13 +19,13 @@ jobs:
     runs-on: ubuntu-latest-4core
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@47ce326218e10e67066c27f618129ac8a13a7033
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@fd57e38fdd95d2d145adb87a1ff0cbbc231316bc
         with:
           cache-node-modules: true
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@47ce326218e10e67066c27f618129ac8a13a7033
+        uses: angular/dev-infra/github-actions/bazel/setup@fd57e38fdd95d2d145adb87a1ff0cbbc231316bc
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@47ce326218e10e67066c27f618129ac8a13a7033
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@fd57e38fdd95d2d145adb87a1ff0cbbc231316bc
         with:
           google_credential: ${{ secrets.RBE_TRUSTED_BUILDS_USER }}
       - name: Setting up Angular snapshot builds
@@ -36,23 +36,18 @@ jobs:
         run: pnpm install
       - name: Run Browser tests
         run: pnpm bazel test --build_tag_filters=-e2e --test_tag_filters=-e2e --build_tests_only -- src/...
-      - uses: ./.github/actions/slack
-        if: ${{ failure() && github.event_name == 'push' }}
-        with:
-          JOB_NAME: 'Browser snapshot test'
-          SLACK_BOT_TOKEN: ${{ secrets.ANGULAR_ROBOT_SLACK_TOKEN }}
 
   linker_snapshot_tests:
     runs-on: ubuntu-latest-4core
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@47ce326218e10e67066c27f618129ac8a13a7033
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@fd57e38fdd95d2d145adb87a1ff0cbbc231316bc
         with:
           cache-node-modules: true
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@47ce326218e10e67066c27f618129ac8a13a7033
+        uses: angular/dev-infra/github-actions/bazel/setup@fd57e38fdd95d2d145adb87a1ff0cbbc231316bc
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@47ce326218e10e67066c27f618129ac8a13a7033
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@fd57e38fdd95d2d145adb87a1ff0cbbc231316bc
         with:
           google_credential: ${{ secrets.RBE_TRUSTED_BUILDS_USER }}
       - name: Setting up Angular snapshot builds
@@ -65,17 +60,12 @@ jobs:
         run: pnpm test-linker-aot
       - name: Run linker tests using JIT
         run: pnpm test-linker-jit
-      - uses: ./.github/actions/slack
-        if: ${{ failure() && github.event_name == 'push' }}
-        with:
-          JOB_NAME: 'Linker snapshot test'
-          SLACK_BOT_TOKEN: ${{ secrets.ANGULAR_ROBOT_SLACK_TOKEN }}
 
   monitor-docs-site:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@47ce326218e10e67066c27f618129ac8a13a7033
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@fd57e38fdd95d2d145adb87a1ff0cbbc231316bc
         with:
           cache-node-modules: true
       # See: https://github.com/puppeteer/puppeteer/pull/13196 and
@@ -85,9 +75,4 @@ jobs:
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       - name: Check Docs Site
-        run: ppnpm ci-docs-monitor-test
-      - uses: ./.github/actions/slack
-        if: ${{ failure() && github.event_name == 'push' }}
-        with:
-          JOB_NAME: 'Docs site monitoring'
-          SLACK_BOT_TOKEN: ${{ secrets.ANGULAR_ROBOT_SLACK_TOKEN }}
+        run: pnpm ci-docs-monitor-test

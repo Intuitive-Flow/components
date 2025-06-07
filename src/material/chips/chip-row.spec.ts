@@ -1,15 +1,15 @@
-import {Directionality} from '@angular/cdk/bidi';
 import {BACKSPACE, DELETE, ENTER, SPACE} from '@angular/cdk/keycodes';
 import {
   createKeyboardEvent,
   dispatchEvent,
   dispatchFakeEvent,
   dispatchKeyboardEvent,
+  dispatchMouseEvent,
+  provideFakeDirectionality,
 } from '@angular/cdk/testing/private';
 import {Component, DebugElement, ElementRef, ViewChild} from '@angular/core';
 import {ComponentFixture, TestBed, fakeAsync, flush, waitForAsync} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
-import {Subject} from 'rxjs';
 import {
   MatChipEditInput,
   MatChipEditedEvent,
@@ -25,20 +25,10 @@ describe('Row Chips', () => {
   let chipNativeElement: HTMLElement;
   let chipInstance: MatChipRow;
 
-  let dir = 'ltr';
-
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [MatChipsModule, SingleChip],
-      providers: [
-        {
-          provide: Directionality,
-          useFactory: () => ({
-            value: dir,
-            change: new Subject(),
-          }),
-        },
-      ],
+      providers: [provideFakeDirectionality('ltr')],
     });
   }));
 
@@ -245,6 +235,90 @@ describe('Row Chips', () => {
         fixture.detectChanges();
         expect(chipNativeElement.querySelector('.mat-chip-edit-input')).toBeTruthy();
       });
+
+      it('should not begin editing on single click', () => {
+        expect(chipNativeElement.querySelector('.mat-chip-edit-input')).toBeFalsy();
+        dispatchMouseEvent(chipNativeElement, 'click');
+        fixture.detectChanges();
+        expect(chipNativeElement.querySelector('.mat-chip-edit-input')).toBeFalsy();
+      });
+
+      it('should begin editing on single click when focused', fakeAsync(() => {
+        expect(chipNativeElement.querySelector('.mat-chip-edit-input')).toBeFalsy();
+        chipNativeElement.focus();
+
+        // Need to also simulate the mousedown as that sets the already focused flag.
+        dispatchMouseEvent(chipNativeElement, 'mousedown');
+        dispatchMouseEvent(chipNativeElement, 'click');
+        fixture.detectChanges();
+        expect(chipNativeElement.querySelector('.mat-chip-edit-input')).toBeTruthy();
+      }));
+
+      describe('when disabled', () => {
+        beforeEach(() => {
+          testComponent.disabled = true;
+          fixture.changeDetectorRef.markForCheck();
+          fixture.detectChanges();
+        });
+
+        it('should not begin editing on double click', () => {
+          expect(chipNativeElement.querySelector('.mat-chip-edit-input')).toBeFalsy();
+          dispatchFakeEvent(chipNativeElement, 'dblclick');
+          fixture.detectChanges();
+          expect(chipNativeElement.querySelector('.mat-chip-edit-input')).toBeFalsy();
+        });
+
+        it('should not begin editing on ENTER', () => {
+          expect(chipNativeElement.querySelector('.mat-chip-edit-input')).toBeFalsy();
+          dispatchKeyboardEvent(chipNativeElement, 'keydown', ENTER);
+          fixture.detectChanges();
+          expect(chipNativeElement.querySelector('.mat-chip-edit-input')).toBeFalsy();
+        });
+
+        it('should not begin editing on single click when focused', fakeAsync(() => {
+          expect(chipNativeElement.querySelector('.mat-chip-edit-input')).toBeFalsy();
+          chipNativeElement.focus();
+
+          // Need to also simulate the mousedown as that sets the already focused flag.
+          dispatchMouseEvent(chipNativeElement, 'mousedown');
+          dispatchMouseEvent(chipNativeElement, 'click');
+          fixture.detectChanges();
+          expect(chipNativeElement.querySelector('.mat-chip-edit-input')).toBeFalsy();
+        }));
+      });
+
+      describe('when not editable', () => {
+        beforeEach(() => {
+          testComponent.editable = false;
+          fixture.changeDetectorRef.markForCheck();
+          fixture.detectChanges();
+        });
+
+        it('should not begin editing on double click', () => {
+          expect(chipNativeElement.querySelector('.mat-chip-edit-input')).toBeFalsy();
+          dispatchFakeEvent(chipNativeElement, 'dblclick');
+          fixture.detectChanges();
+          expect(chipNativeElement.querySelector('.mat-chip-edit-input')).toBeFalsy();
+        });
+
+        it('should not begin editing on ENTER', () => {
+          expect(chipNativeElement.querySelector('.mat-chip-edit-input')).toBeFalsy();
+          dispatchKeyboardEvent(chipNativeElement, 'keydown', ENTER);
+          fixture.detectChanges();
+          expect(chipNativeElement.querySelector('.mat-chip-edit-input')).toBeFalsy();
+        });
+
+        it('should not begin editing on single click when focused', fakeAsync(() => {
+          expect(chipNativeElement.querySelector('.mat-chip-edit-input')).toBeFalsy();
+          chipNativeElement.focus();
+
+          // Need to also simulate the mousedown as that sets the already focused flag.
+          dispatchMouseEvent(chipNativeElement, 'mousedown');
+          dispatchMouseEvent(chipNativeElement, 'click');
+          fixture.detectChanges();
+          expect(chipNativeElement.querySelector('.mat-chip-edit-input')).toBeFalsy();
+        }));
+      });
     });
 
     describe('editing behavior', () => {
@@ -362,6 +436,21 @@ describe('Row Chips', () => {
       }));
     });
 
+    describe('with edit icon', () => {
+      beforeEach(async () => {
+        testComponent.showEditIcon = true;
+        fixture.changeDetectorRef.markForCheck();
+        fixture.detectChanges();
+      });
+
+      it('should begin editing on edit click', () => {
+        expect(chipNativeElement.querySelector('.mat-chip-edit-input')).toBeFalsy();
+        dispatchFakeEvent(chipNativeElement.querySelector('.mat-mdc-chip-edit')!, 'click');
+        fixture.detectChanges();
+        expect(chipNativeElement.querySelector('.mat-chip-edit-input')).toBeTruthy();
+      });
+    });
+
     describe('a11y', () => {
       it('should apply `ariaLabel` and `ariaDesciption` to the primary gridcell', () => {
         fixture.componentInstance.ariaLabel = 'chip name';
@@ -414,6 +503,9 @@ describe('Row Chips', () => {
                   (destroyed)="chipDestroy($event)"
                   (removed)="chipRemove($event)" (edited)="chipEdit($event)"
                   [aria-label]="ariaLabel" [aria-description]="ariaDescription">
+            @if (showEditIcon) {
+              <button matChipEdit>edit</button>
+            }
             {{name}}
             <button matChipRemove>x</button>
             @if (useCustomEditInput) {
@@ -435,6 +527,7 @@ class SingleChip {
   removable: boolean = true;
   shouldShow: boolean = true;
   editable: boolean = false;
+  showEditIcon: boolean = false;
   useCustomEditInput: boolean = true;
   ariaLabel: string | null = null;
   ariaDescription: string | null = null;

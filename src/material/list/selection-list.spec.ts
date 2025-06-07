@@ -43,20 +43,6 @@ describe('MatSelectionList without forms', () => {
     let selectionList: DebugElement;
 
     beforeEach(waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [
-          MatListModule,
-          SelectionListWithListOptions,
-          SelectionListWithCheckboxPositionAfter,
-          SelectionListWithListDisabled,
-          SelectionListWithOnlyOneOption,
-          SelectionListWithIndirectChildOptions,
-          SelectionListWithSelectedOptionAndValue,
-        ],
-      });
-    }));
-
-    beforeEach(waitForAsync(() => {
       fixture = TestBed.createComponent(SelectionListWithListOptions);
       fixture.detectChanges();
 
@@ -1275,22 +1261,6 @@ describe('MatSelectionList without forms', () => {
 });
 
 describe('MatSelectionList with forms', () => {
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        MatListModule,
-        FormsModule,
-        ReactiveFormsModule,
-        SelectionListWithModel,
-        SelectionListWithFormControl,
-        SelectionListWithPreselectedOption,
-        SelectionListWithPreselectedOptionAndModel,
-        SelectionListWithPreselectedFormControlOnPush,
-        SelectionListWithCustomComparator,
-      ],
-    });
-  }));
-
   describe('and ngModel', () => {
     let fixture: ComponentFixture<SelectionListWithModel>;
     let selectionListDebug: DebugElement;
