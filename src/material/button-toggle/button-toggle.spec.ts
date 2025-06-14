@@ -12,20 +12,6 @@ import {
 } from './index';
 
 describe('MatButtonToggle with forms', () => {
-  beforeEach(fakeAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        MatButtonToggleModule,
-        FormsModule,
-        ReactiveFormsModule,
-        ButtonToggleGroupWithNgModel,
-        ButtonToggleGroupWithFormControl,
-        ButtonToggleGroupWithIndirectDescendantToggles,
-        ButtonToggleGroupWithFormControlAndDynamicButtons,
-      ],
-    });
-  }));
-
   describe('using FormControl', () => {
     let fixture: ComponentFixture<ButtonToggleGroupWithFormControl>;
     let groupDebugElement: DebugElement;
@@ -325,26 +311,6 @@ describe('MatButtonToggle with forms', () => {
 });
 
 describe('MatButtonToggle without forms', () => {
-  beforeEach(fakeAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        MatButtonToggleModule,
-        ButtonTogglesInsideButtonToggleGroup,
-        ButtonTogglesInsideButtonToggleGroupMultiple,
-        FalsyButtonTogglesInsideButtonToggleGroupMultiple,
-        ButtonToggleGroupWithInitialValue,
-        StandaloneButtonToggle,
-        ButtonToggleWithAriaLabel,
-        ButtonToggleWithAriaLabelledby,
-        RepeatedButtonTogglesWithPreselectedValue,
-        ButtonToggleWithTabindex,
-        ButtonToggleWithStaticName,
-        ButtonToggleWithStaticChecked,
-        ButtonToggleWithStaticAriaAttributes,
-      ],
-    });
-  }));
-
   describe('inside of an exclusive selection group', () => {
     let fixture: ComponentFixture<ButtonTogglesInsideButtonToggleGroup>;
     let groupDebugElement: DebugElement;

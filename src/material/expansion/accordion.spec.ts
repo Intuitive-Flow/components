@@ -19,17 +19,6 @@ describe('MatAccordion', () => {
   let focusMonitor: FocusMonitor;
 
   beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        MatExpansionModule,
-        AccordionWithHideToggle,
-        AccordionWithTogglePosition,
-        NestedPanel,
-        SetOfItems,
-        NestedAccordions,
-      ],
-    });
-
     focusMonitor = TestBed.inject(FocusMonitor);
   }));
 

@@ -42,6 +42,7 @@ import {
   ViewChild,
   ViewEncapsulation,
   DOCUMENT,
+  signal,
 } from '@angular/core';
 import {fromEvent, merge, Observable, Subject} from 'rxjs';
 import {debounceTime, filter, map, mapTo, startWith, take, takeUntil} from 'rxjs/operators';
@@ -165,7 +166,9 @@ export class MatDrawerContent extends CdkScrollable implements AfterContentInit 
     // this was also done by the animations module which some internal tests seem to depend on.
     // Simulate it by toggling the `hidden` attribute instead.
     '[style.visibility]': '(!_container && !opened) ? "hidden" : null',
-    'tabIndex': '-1',
+    // The sidenav container should not be focused on when used in side mode. See b/286459024 for
+    // reference. Updates tabIndex of drawer/container to default to null if in side mode.
+    '[attr.tabIndex]': '(mode !== "side") ? "-1" : null',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
@@ -271,12 +274,12 @@ export class MatDrawer implements AfterViewInit, OnDestroy {
    */
   @Input()
   get opened(): boolean {
-    return this._opened;
+    return this._opened();
   }
   set opened(value: BooleanInput) {
     this.toggle(coerceBooleanProperty(value));
   }
-  private _opened: boolean = false;
+  private _opened = signal(false);
 
   /** How the sidenav was opened (keypress, mouse click etc.) */
   private _openedVia: FocusOrigin | null;
@@ -383,7 +386,7 @@ export class MatDrawer implements AfterViewInit, OnDestroy {
     });
 
     this._animationEnd.subscribe(() => {
-      this.openedChange.emit(this._opened);
+      this.openedChange.emit(this.opened);
     });
   }
 
@@ -574,11 +577,11 @@ export class MatDrawer implements AfterViewInit, OnDestroy {
     restoreFocus: boolean,
     focusOrigin: Exclude<FocusOrigin, null>,
   ): Promise<MatDrawerToggleResult> {
-    if (isOpen === this._opened) {
+    if (isOpen === this.opened) {
       return Promise.resolve(isOpen ? 'open' : 'close');
     }
 
-    this._opened = isOpen;
+    this._opened.set(isOpen);
 
     if (this._container?._transitionsEnabled) {
       // Note: it's importatnt to set this as early as possible,

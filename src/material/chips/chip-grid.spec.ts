@@ -1,4 +1,4 @@
-import {Direction, Directionality} from '@angular/cdk/bidi';
+import {Direction} from '@angular/cdk/bidi';
 import {
   BACKSPACE,
   DELETE,
@@ -18,28 +18,36 @@ import {
   dispatchFakeEvent,
   dispatchKeyboardEvent,
   patchElementFocus,
+  provideFakeDirectionality,
   typeInElement,
 } from '@angular/cdk/testing/private';
 import {
   ChangeDetectorRef,
   Component,
   DebugElement,
-  EventEmitter,
   QueryList,
   Type,
   ViewChild,
   ViewChildren,
+  WritableSignal,
   inject,
+  signal,
 } from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ComponentFixture, TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
 import {FormControl, FormsModule, NgForm, ReactiveFormsModule, Validators} from '@angular/forms';
-import {MatFormFieldModule} from '../form-field';
-import {MatInputModule} from '../input';
 import {By} from '@angular/platform-browser';
-import {MatChipEvent, MatChipGrid, MatChipInputEvent, MatChipRow, MatChipsModule} from './index';
-import {MATERIAL_ANIMATIONS} from '../core';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {MATERIAL_ANIMATIONS} from '../core';
+import {MatError, MatFormField, MatHint, MatLabel} from '../form-field';
+import {
+  MatChipEvent,
+  MatChipGrid,
+  MatChipInput,
+  MatChipInputEvent,
+  MatChipRemove,
+  MatChipRow,
+} from './index';
 
 describe('MatChipGrid', () => {
   let chipGridDebugElement: DebugElement;
@@ -47,7 +55,7 @@ describe('MatChipGrid', () => {
   let chipGridInstance: MatChipGrid;
   let chips: QueryList<MatChipRow>;
   let testComponent: StandardChipGrid;
-  let directionality: {value: Direction; change: EventEmitter<Direction>};
+  let directionality: WritableSignal<Direction>;
   let primaryActions: NodeListOf<HTMLElement>;
 
   const expectNoCellFocused = () => {
@@ -262,7 +270,7 @@ describe('MatChipGrid', () => {
           fixture = createComponent(ChipGridWithRemove);
           flush();
           trailingActions = chipGridNativeElement.querySelectorAll(
-            '.mdc-evolution-chip__action--trailing',
+            '.mdc-evolution-chip__action--secondary',
           );
         }));
 
@@ -441,8 +449,7 @@ describe('MatChipGrid', () => {
 
           expect(document.activeElement).toBe(primaryActions[1]);
 
-          directionality.value = 'rtl';
-          directionality.change.next('rtl');
+          directionality.set('rtl');
           fixture.detectChanges();
 
           dispatchKeyboardEvent(primaryActions[1], 'keydown', RIGHT_ARROW);
@@ -588,7 +595,7 @@ describe('MatChipGrid', () => {
       const fixture = createComponent(ChipGridWithRemove, undefined, [NoopAnimationsModule]);
       flush();
       const trailingActions = chipGridNativeElement.querySelectorAll<HTMLElement>(
-        '.mdc-evolution-chip__action--trailing',
+        '.mdc-evolution-chip__action--secondary',
       );
       const chip = chips.get(2)!;
       chip.focus();
@@ -1024,25 +1031,14 @@ describe('MatChipGrid', () => {
     direction: Direction = 'ltr',
     additionalImports: Type<unknown>[] = [],
   ): ComponentFixture<T> {
-    directionality = {
-      value: direction,
-      change: new EventEmitter<Direction>(),
-    } as Directionality;
+    directionality = signal(direction);
 
     TestBed.configureTestingModule({
-      imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        MatChipsModule,
-        MatFormFieldModule,
-        MatInputModule,
-        ...additionalImports,
-      ],
+      imports: additionalImports,
       providers: [
-        {provide: Directionality, useValue: directionality},
+        provideFakeDirectionality(directionality),
         {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
       ],
-      declarations: [component],
     });
 
     const fixture = TestBed.createComponent<T>(component);
@@ -1069,7 +1065,7 @@ describe('MatChipGrid', () => {
       }
     </mat-chip-grid>
     <input name="test" [matChipInputFor]="chipGrid"/>`,
-  standalone: false,
+  imports: [MatChipGrid, MatChipRow, MatChipInput],
 })
 class StandardChipGrid {
   name: string = 'Test';
@@ -1091,7 +1087,7 @@ class StandardChipGrid {
       <input name="test" [matChipInputFor]="chipGrid"/>
     </mat-form-field>
   `,
-  standalone: false,
+  imports: [MatChipGrid, MatChipRow, MatChipInput, MatFormField, MatLabel],
 })
 class FormFieldChipGrid {
   chips = ['Chip 0', 'Chip 1', 'Chip 2'];
@@ -1123,7 +1119,7 @@ class FormFieldChipGrid {
           (matChipInputTokenEnd)="add($event)"/>
     </mat-form-field>
   `,
-  standalone: false,
+  imports: [MatChipGrid, MatChipRow, MatChipInput, MatFormField, MatLabel, ReactiveFormsModule],
 })
 class InputChipGrid {
   foods: any[] = [
@@ -1170,20 +1166,30 @@ class InputChipGrid {
 
 @Component({
   template: `
-<form #form="ngForm" novalidate>
-  <mat-form-field>
-    <mat-chip-grid #chipGrid [formControl]="formControl">
-      @for (food of foods; track food) {
-        <mat-chip-row [value]="food.value">{{food.viewValue}}</mat-chip-row>
-      }
-    </mat-chip-grid>
-    <input name="test" [matChipInputFor]="chipGrid"/>
-    <mat-hint>Please select a chip, or type to add a new chip</mat-hint>
-    <mat-error>Should have value</mat-error>
-  </mat-form-field>
-</form>
+    <form #form="ngForm" novalidate>
+      <mat-form-field>
+        <mat-chip-grid #chipGrid [formControl]="formControl">
+          @for (food of foods; track food) {
+            <mat-chip-row [value]="food.value">{{food.viewValue}}</mat-chip-row>
+          }
+        </mat-chip-grid>
+        <input name="test" [matChipInputFor]="chipGrid"/>
+        <mat-hint>Please select a chip, or type to add a new chip</mat-hint>
+        <mat-error>Should have value</mat-error>
+      </mat-form-field>
+    </form>
   `,
-  standalone: false,
+  imports: [
+    MatChipGrid,
+    MatChipRow,
+    MatChipInput,
+    MatFormField,
+    MatHint,
+    MatError,
+    MatLabel,
+    ReactiveFormsModule,
+    FormsModule,
+  ],
 })
 class ChipGridWithFormErrorMessages {
   foods: any[] = [
@@ -1219,7 +1225,7 @@ class ChipGridWithFormErrorMessages {
       <input name="test" [matChipInputFor]="chipGrid"/>
     </mat-form-field>
   `,
-  standalone: false,
+  imports: [MatChipGrid, MatChipRow, MatChipInput, MatFormField, MatChipRemove],
 })
 class ChipGridWithRemove {
   chips = [0, 1, 2, 3, 4];
